@@ -1,0 +1,34 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Plugin Google Services (untuk Firebase) → konsisten 4.4.2
+        classpath 'com.google.gms:google-services:4.4.2'
+    }
+}
+
+// Hilangkan plugin block di sini, biarkan hanya ada di settings.gradle
+// karena deklarasi plugin utama sudah ditangani di android/settings.gradle
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
