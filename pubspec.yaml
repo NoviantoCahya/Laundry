@@ -10,13 +10,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   shared_preferences: ^2.2.2
   cupertino_icons: ^1.0.8
 
-  # 🔥 Tambahkan Firebase packages
+  # 🔥 Firebase
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.0
   cloud_firestore: ^5.4.4
+
+  # 🌐 Untuk buka WhatsApp
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

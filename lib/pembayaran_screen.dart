@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'riwayat_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PembayaranScreen extends StatelessWidget {
   final String nama;
@@ -12,102 +12,142 @@ class PembayaranScreen extends StatelessWidget {
     required this.layanan,
   });
 
-  void _selesaikanPesanan(BuildContext context) {
-    RiwayatScreen.riwayatPesanan.add({
-      "nama": nama,
-      "alamat": alamat,
-      "layanan": layanan,
-      "metode": "QRIS",
-    });
+  // Fungsi kirim WhatsApp
+  void _kirimWhatsApp() async {
+    final nomor = "62881036567620";
+    final pesan = Uri.encodeComponent(
+        "Halo Admin Laundry, saya sudah melakukan pembayaran via QRIS.\n\n"
+        "Nama: $nama\nAlamat: $alamat\nLayanan: $layanan\n\n"
+        "Berikut saya kirim bukti pembayarannya.");
+    final url = "https://wa.me/$nomor?text=$pesan";
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => RiwayatScreen()),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Pesanan berhasil disimpan ke Riwayat"),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF8EEF8), // warna background halus
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text(
-          "Pembayaran",
-          style: TextStyle(color: Colors.white),
-        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          "Pembayaran",
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
 
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
+        /// GRADIENT FULLSCREEN
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF4A90E2), // biru atas
+              Color(0xFF70B2FF), // biru tengah
+              Color(0xFFE8F0FF), // biru terang bawah
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
 
-              const Text(
-                "Qris",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 10),
 
-              const SizedBox(height: 12),
-
-              // KOTAK QR
-              Container(
-                height: 220,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    "assets/qris.png",
-                    height: 170,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Text(
-                        "QRIS tidak ditemukan",
-                        style: TextStyle(color: Colors.red),
-                      );
-                    },
+                const Text(
+                  "Silakan screenshot QRIS di bawah\nuntuk melakukan pembayaran",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                    color: Colors.black87,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 40),
+                const SizedBox(height: 25),
 
-              // TOMBOL SIMPAN
-              Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade400,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                // CARD QRIS PREMIUM
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(26),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        "QRIS Pembayaran",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.asset(
+                          "assets/qris.png",
+                          height: 260,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // TOMBOL KONFIRMASI
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _kirimWhatsApp,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Colors.green.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 3,
+                    ),
+                    child: const Text(
+                      "Konfirmasi Pembayaran",
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  onPressed: () => _selesaikanPesanan(context),
-                  child: const Text(
-                    "Simpan",
-                    style: TextStyle(fontSize: 16),
-                  ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
